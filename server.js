@@ -17,15 +17,15 @@ mongoose.set('debug', false)
 
 mongoose.connect(`mongodb://${global.config.MONGODB_HOST}/${global.config.MONGODB_COLLECTION_NAME}`)
 
-mongoose.connection.on('connected', function() {
+mongoose.connection.on('connected', function () {
     winston.info('MongoDB event connected')
 })
 
-mongoose.connection.on('disconnected', function() {
+mongoose.connection.on('disconnected', function () {
     winston.warn('MongoDB event disconnected')
 })
 
-mongoose.connection.on('reconnected', function() {
+mongoose.connection.on('reconnected', function () {
     winston.info('MongoDB event reconnected')
 })
 

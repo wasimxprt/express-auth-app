@@ -1,6 +1,7 @@
 import UserModel from "../models/user";
 import jwt from 'jsonwebtoken';
 import config from '../config/config';
+import bcrypt from 'bcryptjs'
 
 /** 
  *  User class with methods for user management
@@ -21,33 +22,48 @@ export class UserController {
     postLogin = (req, res, next) => {
 
         return new Promise((resolve, reject) => {
-            let data = {
-                email: req.body.email,
-                password: req.body.password
-            };
 
-            this.userModel
-                .findOne(data)
-                .select('-password -__v')
-                .then((user) => {                    
-                    if (user) {
-                        let token = jwt.sign(user.toObject(), config.jwt_secret, {
-                            expiresIn: 1440 // expires in 1 hour
-                        });
-                        resolve(user);
-                        res.json({ status: true, token, user, "message": "Authentication successful" });
-                        next();
+            this.userModel.findOne({
+                email: req.body.email
+            }, function (err, user) {
+                if (err) throw err;
+                if (!user) {
+                    res.status(401).json({ status: false, message: 'Authentication failed. User not found.' });
+                } else if (user) {
+                    if (!user.comparePassword(req.body.password)) {
+                        res.status(401).json({ status: false, message: 'Authentication failed. Wrong password.' });
                     } else {
-                        reject(res.status(401).send({
-                            status: false,
-                            error: "Invalid credentials"
-                        }))
-                        next();
+                        return res.json({ status: true, token: jwt.sign({ email: user.email, fullName: user.fullName, _id: user._id }, 'RESTFULAPIs') });
                     }
-                })
-                .catch((error) => {
-                    next(error);
-                });
+                }
+            });
+            // let data = {
+            //     email: req.body.email,
+            //     password: req.body.password
+            // };
+
+            // this.userModel
+            //     .findOne(data)
+            //     .select('-password -__v')
+            //     .then((user) => {
+            //         if (user) {
+            //             let token = jwt.sign(user.toObject(), config.jwt_secret, {
+            //                 expiresIn: 1440 // expires in 1 hour
+            //             });
+            //             resolve(user);
+            //             res.json({ status: true, token, user, "message": "Authentication successful" });
+            //             next();
+            //         } else {
+            //             reject(res.status(401).send({
+            //                 status: false,
+            //                 error: "Invalid credentials"
+            //             }))
+            //             next();
+            //         }
+            //     })
+            //     .catch((error) => {
+            //         next(error);
+            //     });
         });
 
     }
@@ -72,7 +88,7 @@ export class UserController {
                         const newUser = new this.userModel({
                             name: req.body.name,
                             email: req.body.email,
-                            password: req.body.password
+                            password: bcrypt.hashSync(req.body.password, 10)
                         });
                         newUser.save()
                             .then((user) => {
