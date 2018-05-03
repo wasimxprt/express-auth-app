@@ -15,4 +15,4 @@ router.put("/api/user/:id", verifyToken, userController.updateUser);
 router.delete("/api/user/:id", verifyToken, userController.deleteUser);
 router.get("/api/products", productController.getAllProducts);
 
-module.exports = router;
+module.exports = router

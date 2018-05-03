@@ -24,8 +24,8 @@ export class ProductController {
                 .select()
                 .then((products) => {
                     if (products) {
-                        resolve(products);
-                        res.json({ status: true, products, "message": "Products found" });
+                        //resolve({ status: 200, products, "message": "Products found" });
+                        res.json({ status: 200, products, "message": "Products found" });
                         next();
                     } else {
                         reject("No Product not found!");

@@ -28,12 +28,12 @@ export class UserController {
             }, function (err, user) {
                 if (err) throw err;
                 if (!user) {
-                    res.status(401).json({ status: false, message: 'Authentication failed. User not found.' });
+                    res.status(401).json({ message: 'Authentication failed. User not found.' });
                 } else if (user) {
                     if (!user.comparePassword(req.body.password)) {
                         res.status(401).json({ status: false, message: 'Authentication failed. Wrong password.' });
                     } else {
-                        return res.json({ status: true, token: jwt.sign({ email: user.email, fullName: user.fullName, _id: user._id }, 'RESTFULAPIs') });
+                        return res.json({ status: true, token: jwt.sign({ email: user.email, fullName: user.name, _id: user._id }, config.jwt_secret, { expiresIn: '1h' }) });
                     }
                 }
             });
@@ -181,22 +181,22 @@ export class UserController {
                     if (user) {
                         this.userModel
                             .findOneAndUpdate(
-                            {
-                                _id: userId
-                            },
+                                {
+                                    _id: userId
+                                },
 
-                            { $set: reqObj },
-                            { new: true },
-                            (err, objectUpdate) => {
-                                if (err) {
-                                    reject(err);
-                                    res.json({ error: err });
-                                }
-                                else {
-                                    resolve(objectUpdate);
-                                    res.json({ user: objectUpdate });
-                                }
-                            });
+                                { $set: reqObj },
+                                { new: true },
+                                (err, objectUpdate) => {
+                                    if (err) {
+                                        reject(err);
+                                        res.json({ error: err });
+                                    }
+                                    else {
+                                        resolve(objectUpdate);
+                                        res.json({ user: objectUpdate });
+                                    }
+                                });
                     } else {
                         reject("No User not found!");
                         reject(res.json({ status: false, error: "No User not found!" }));
@@ -226,19 +226,19 @@ export class UserController {
                     if (user) {
                         this.userModel
                             .remove(
-                            {
-                                _id: userId
-                            },
-                            (err) => {
-                                if (err) {
-                                    reject(err);
-                                    res.json({ error: err });
-                                }
-                                else {
-                                    resolve();
-                                    res.json({ status: true, message: "User deleted successfully" })
-                                }
-                            });
+                                {
+                                    _id: userId
+                                },
+                                (err) => {
+                                    if (err) {
+                                        reject(err);
+                                        res.json({ error: err });
+                                    }
+                                    else {
+                                        resolve();
+                                        res.json({ status: true, message: "User deleted successfully" })
+                                    }
+                                });
                     } else {
                         reject(res.json({ status: false, error: "No User not found!" }));
                         next();

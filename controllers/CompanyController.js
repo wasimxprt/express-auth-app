@@ -9,7 +9,7 @@ export class CompanyController {
     /**
      * constructor to initialize the properties
      */
-    constructor() {}
+    constructor() { }
 
     /**
      * Method to find company by id
@@ -18,7 +18,7 @@ export class CompanyController {
         let id = req.params.id;
         return new Promise((resolve, reject) => {
 
-            request('http://avoindata.prh.fi/opendata/bis/v1/' + id, function(error, response, body) {
+            request('http://avoindata.prh.fi/opendata/bis/v1/' + id, function (error, response, body) {
                 if (!error && response.statusCode == 200) {
                     var results = response;
                     resolve(results);

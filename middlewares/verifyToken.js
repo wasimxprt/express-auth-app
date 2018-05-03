@@ -2,10 +2,11 @@ import jwt from 'jsonwebtoken';
 import config from '../config/config';
 
 module.exports = function (req, res, next) {
-    var token = req.body.token || req.query.token || req.headers.token;
+    var token = req.body.token || req.query.token || req.headers.authorization;
+
     if (token) {
         // verifies secret and checks exp
-        jwt.verify(token, config.jwt_secret, function (err, decoded) {
+        jwt.verify(token.replace("Bearer ", ''), config.jwt_secret, function (err, decoded) {
             if (err) { //failed verification. 
                 return res.status(401).send({
                     "error": true,
